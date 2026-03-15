@@ -1,1132 +1,1113 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2113.65">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-    span.s1 {font: 12.0px 'Lucida Grande'}
-    span.s2 {font: 12.0px 'Apple Symbols'}
-    span.s3 {font: 12.0px 'Apple Color Emoji'}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operon AI — AI Consulting & Automation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050810;
+      --bg2: #080d1a;
+      --surface: #0d1428;
+      --border: rgba(255,255,255,0.07);
+      --accent: #00f0c8;
+      --accent2: #3d6bff;
+      --accent3: #ff4d6d;
+      --text: #e8eaf2;
+      --muted: #6b7294;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(0,240,200,0.4);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* GRID BACKGROUND */
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,240,200,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,200,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 20px 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,16,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent) !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s !important;
+      font-family: var(--font-mono);
+    }
+    .nav-cta:hover { background: var(--accent) !important; color: var(--bg) !important; }
+
+    /* PAGE SECTIONS */
+    .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+    .page.active { display: block; }
+
+    /* ===================== HOME PAGE ===================== */
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 140px 6vw 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .orb1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,240,200,0.12), transparent 70%);
+      top: -100px; right: -100px;
+      animation: orb-float 8s ease-in-out infinite;
+    }
+    .orb2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(61,107,255,0.12), transparent 70%);
+      bottom: 0; left: -100px;
+      animation: orb-float 10s ease-in-out infinite reverse;
+    }
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-30px); }
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,240,200,0.06);
+      border: 1px solid rgba(0,240,200,0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+      width: fit-content;
+      margin-bottom: 32px;
+      animation: fade-up 0.6s ease both;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero-headline {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+      max-width: 900px;
+      animation: fade-up 0.6s 0.1s ease both;
+    }
+    .hero-headline .line2 {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fade-up 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      animation: fade-up 0.6s 0.3s ease both;
+    }
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,240,200,0.3);
+    }
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-stats {
+      display: flex; gap: 48px; margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+      animation: fade-up 0.6s 0.4s ease both;
+      flex-wrap: wrap;
+    }
+    .stat-val {
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      overflow: hidden;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .marquee-track {
+      display: flex; gap: 60px;
+      animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .marquee-item::after {
+      content: '◆';
+      color: var(--accent);
+      font-size: 0.5rem;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* SERVICES */
+    .section {
+      padding: 100px 6vw;
+    }
+    .section-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 64px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .service-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .service-card:hover { background: var(--bg2); }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-num {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .service-name {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .service-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .service-tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .tag {
+      font-size: 0.68rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+
+    /* HOW IT WORKS */
+    .process-section {
+      padding: 100px 6vw;
+      background: var(--bg2);
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px;
+      margin-top: 64px;
+      background: var(--border);
+    }
+    .process-step {
+      background: var(--bg2);
+      padding: 36px 28px;
+      position: relative;
+    }
+    .step-num {
+      font-family: var(--font-head);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: rgba(0,240,200,0.08);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .step-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .step-connector {
+      position: absolute;
+      right: -1px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      font-size: 0.8rem;
+      opacity: 0.4;
+    }
+
+    /* CTA BANNER */
+    .cta-banner {
+      padding: 80px 6vw;
+      background: linear-gradient(135deg, rgba(0,240,200,0.05), rgba(61,107,255,0.05));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .cta-banner h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .cta-banner p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    /* ===================== ABOUT PAGE ===================== */
+    .about-hero {
+      padding: 160px 6vw 80px;
+      position: relative;
+    }
+    .about-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-bottom: 100px;
+    }
+    .about-text h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .about-text p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .about-visual {
+      position: relative;
+      height: 400px;
+    }
+    .about-card {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      border-radius: 8px;
+    }
+    .about-card.card1 { top: 0; left: 0; right: 60px; }
+    .about-card.card2 { bottom: 0; left: 60px; right: 0; border-top: 2px solid var(--accent); }
+    .card-label { font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .card-value { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+    .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    .mission-section {
+      padding: 80px 6vw;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .value-card {
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    .value-card:hover { border-color: var(--accent); }
+    .value-icon { font-size: 1.8rem; margin-bottom: 16px; }
+    .value-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .value-text { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+
+    .team-section { padding: 80px 6vw; }
+    .address-block {
+      margin-top: 64px;
+      padding: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      max-width: 500px;
+    }
+    .address-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .address-text { font-size: 0.88rem; line-height: 1.9; color: var(--muted); }
+    .legal-name { font-size: 0.78rem; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    /* ===================== CONTACT PAGE ===================== */
+    .contact-page {
+      padding: 160px 6vw 80px;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contact-left h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .contact-left p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+    .contact-info-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 28px;
+    }
+    .ci-icon {
+      width: 40px; height: 40px;
+      background: rgba(0,240,200,0.08);
+      border: 1px solid rgba(0,240,200,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .ci-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .ci-value { font-size: 0.88rem; color: var(--text); }
+
+    /* FORM */
+    .contact-form {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 48px;
+    }
+    .form-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .form-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 36px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      border-radius: 2px;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group select option { background: var(--bg2); }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-submit {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 16px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: box-shadow 0.2s, transform 0.2s;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .form-submit:hover {
+      box-shadow: 0 8px 30px rgba(0,240,200,0.35);
+      transform: translateY(-1px);
+    }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+    .form-success .check { font-size: 3rem; margin-bottom: 16px; }
+    .form-success h3 {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .form-success p { font-size: 0.85rem; color: var(--muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 6vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: var(--bg);
+      position: relative; z-index: 1;
+    }
+    .footer-logo {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .footer-copy { font-size: 0.75rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .about-intro, .contact-grid { grid-template-columns: 1fr; }
+      .about-visual { height: 280px; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-form { padding: 28px; }
+      .hero-stats { gap: 28px; }
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Operon AI — AI Consulting &amp; Automation&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&amp;family=DM+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg: #050810;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg2: #080d1a;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--surface: #0d1428;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--border: rgba(255,255,255,0.07);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent: #00f0c8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent2: #3d6bff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent3: #ff4d6d;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text: #e8eaf2;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--muted: #6b7294;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--font-head: 'Syne', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--font-mono: 'DM Mono', monospace;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>html { scroll-behavior: smooth; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-x: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* CUSTOM CURSOR */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.cursor {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 10px; height: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed; top: 0; left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 9999;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.1s ease;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>mix-blend-mode: screen;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.cursor-ring {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 36px; height: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(0,240,200,0.4);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed; top: 0; left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 9998;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* NOISE OVERLAY */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body::before {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed; inset: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 1000;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.4;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* GRID BACKGROUND */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.grid-bg {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed; inset: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-image:</p>
-<p class="p1"><span class="Apple-converted-space">        </span>linear-gradient(rgba(0,240,200,0.03) 1px, transparent 1px),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>linear-gradient(90deg, rgba(0,240,200,0.03) 1px, transparent 1px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-size: 60px 60px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* NAV */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>nav {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed; top: 0; left: 0; right: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 500;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(5,8,16,0.7);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(20px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-logo {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.3rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.02em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-logo-icon {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 32px; height: 32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: linear-gradient(135deg, var(--accent), var(--accent2));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-links {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; gap: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>list-style: none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-links a {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.08em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-links a:hover { color: var(--accent); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-cta {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent) !important;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 8px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: background 0.2s, color 0.2s !important;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.nav-cta:hover { background: var(--accent) !important; color: var(--bg) !important; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* PAGE SECTIONS */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.page { display: none; min-height: 100vh; position: relative; z-index: 1; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.page.active { display: block; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* ===================== HOME PAGE ===================== */</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* HERO */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 140px 6vw 80px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-orb {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>filter: blur(80px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.orb1 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 600px; height: 600px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: radial-gradient(circle, rgba(0,240,200,0.12), transparent 70%);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>top: -100px; right: -100px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: orb-float 8s ease-in-out infinite;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.orb2 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 400px; height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: radial-gradient(circle, rgba(61,107,255,0.12), transparent 70%);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>bottom: 0; left: -100px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: orb-float 10s ease-in-out infinite reverse;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@keyframes orb-float {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>0%, 100% { transform: translateY(0px); }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>50% { transform: translateY(-30px); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-tag {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: inline-flex; align-items: center; gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.72rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.15em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(0,240,200,0.06);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(0,240,200,0.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 6px 14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 100px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: fit-content;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: fade-up 0.6s ease both;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-tag::before {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 6px; height: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: pulse 2s infinite;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@keyframes pulse {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>0%, 100% { opacity: 1; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>50% { opacity: 0.3; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-headline {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(3rem, 7vw, 6.5rem);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 900px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: fade-up 0.6s 0.1s ease both;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-headline .line2 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: linear-gradient(90deg, var(--accent), var(--accent2));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>-webkit-background-clip: text;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>-webkit-text-fill-color: transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-clip: text;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-sub {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 540px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.7;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: fade-up 0.6s 0.2s ease both;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-actions {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; gap: 16px; flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: fade-up 0.6s 0.3s ease both;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.05em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.2s, box-shadow 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary:hover {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 12px 40px rgba(0,240,200,0.3);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-ghost {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.05em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: border-color 0.2s, color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero-stats {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; gap: 48px; margin-top: 80px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-top: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: fade-up 0.6s 0.4s ease both;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stat-val {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 2.2rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.06em; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* MARQUEE */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.marquee-wrap {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.marquee-track {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; gap: 60px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation: marquee 20s linear infinite;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: max-content;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.marquee-item {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.75rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.12em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>white-space: nowrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; gap: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.marquee-item::after {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>content: '<span class="s1">◆</span>';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@keyframes marquee {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>0% { transform: translateX(0); }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>100% { transform: translateX(-50%); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* SERVICES */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 100px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-tag {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.72rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.15em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-title {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(2rem, 4vw, 3.2rem);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.1;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-sub {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.7;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 500px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 64px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.services-grid {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 1px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 40px 36px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: background 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-card:hover { background: var(--bg2); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-card::before {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>top: 0; left: 0; right: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: linear-gradient(90deg, var(--accent), var(--accent2));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: scaleX(0);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform-origin: left;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-card:hover::before { transform: scaleX(1); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-num {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.7rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.15em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.7;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-icon {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-name {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.3rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-desc {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.82rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.7;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.service-tags {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; flex-wrap: wrap; gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tag {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.68rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 4px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 100px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.05em;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* HOW IT WORKS */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.process-section {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 100px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.process-steps {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 64px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.process-step {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 36px 28px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.step-num {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 3.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: rgba(0,240,200,0.08);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.step-title {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.step-desc {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.7;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.step-connector {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>right: -1px; top: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-50%);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.4;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* CTA BANNER */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.cta-banner {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 80px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: linear-gradient(135deg, rgba(0,240,200,0.05), rgba(61,107,255,0.05));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.cta-banner h2 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(1.8rem, 4vw, 3rem);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.cta-banner p {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* ===================== ABOUT PAGE ===================== */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-hero {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 160px 6vw 80px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-intro {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 1fr 1fr;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 80px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 100px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-text h1 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(2.2rem, 4vw, 3.5rem);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.05;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-text p {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.88rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-visual {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 24px 28px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-card.card1 { top: 0; left: 0; right: 60px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.about-card.card2 { bottom: 0; left: 60px; right: 0; border-top: 2px solid var(--accent); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-label { font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-value { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; color: var(--accent); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.mission-section {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 80px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.values-grid {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.value-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: border-color 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.value-card:hover { border-color: var(--accent); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.value-icon { font-size: 1.8rem; margin-bottom: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.value-title {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.value-text { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.team-section { padding: 80px 6vw; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.address-block {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 64px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 500px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.address-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.address-text { font-size: 0.88rem; line-height: 1.9; color: var(--muted); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.legal-name { font-size: 0.78rem; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* ===================== CONTACT PAGE ===================== */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-page {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 160px 6vw 80px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-grid {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 1fr 1.2fr;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 80px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: start;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-left h1 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(2rem, 4vw, 3.2rem);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: -0.03em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.05;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-left p {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.88rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-info-item {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: flex-start; gap: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ci-icon {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 40px; height: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(0,240,200,0.08);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(0,240,200,0.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; align-items: center; justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-shrink: 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ci-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ci-value { font-size: 0.88rem; color: var(--text); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* FORM */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.contact-form {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-title {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.3rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 36px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-row {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 1fr 1fr;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex; flex-direction: column; gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group label {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.72rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.08em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group input,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group select,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group textarea {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: border-color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group input:focus,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group select:focus,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group textarea:focus { border-color: var(--accent); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group select option { background: var(--bg2); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group textarea { resize: vertical; min-height: 110px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-submit {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.08em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: box-shadow 0.2s, transform 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-submit:hover {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 8px 30px rgba(0,240,200,0.35);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-1px);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-success {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 40px 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-success .check { font-size: 3rem; margin-bottom: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-success h3 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.3rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-success p { font-size: 0.85rem; color: var(--muted); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* FOOTER */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>footer {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 40px 6vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative; z-index: 1;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-logo {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: var(--font-head);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-copy { font-size: 0.75rem; color: var(--muted); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-links { display: flex; gap: 24px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-links a {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.75rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-links a:hover { color: var(--accent); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* ANIMATIONS */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@keyframes fade-up {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>from { opacity: 0; transform: translateY(20px); }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>to { opacity: 1; transform: translateY(0); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.reveal {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(30px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: opacity 0.6s ease, transform 0.6s ease;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.reveal.visible { opacity: 1; transform: translateY(0); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* RESPONSIVE */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.nav-links { display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.about-intro, .contact-grid { grid-template-columns: 1fr; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.about-visual { height: 280px; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.form-row { grid-template-columns: 1fr; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.contact-form { padding: 28px; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.hero-stats { gap: 28px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="cursor" id="cursor"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="cursor-ring" id="cursorRing"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="grid-bg"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- NAV --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;nav&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;a href="#" class="nav-logo" onclick="showPage('home')"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="nav-logo-icon"&gt;<span class="s2">⬡</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>Operon&lt;span style="color:var(--accent)"&gt;AI&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;ul class="nav-links"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;li&gt;&lt;a href="#" onclick="showPage('home')"&gt;Home&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;li&gt;&lt;a href="#" onclick="showPage('about')"&gt;About&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;li&gt;&lt;a href="#" onclick="showPage('contact')" class="nav-cta"&gt;Book a Consultation&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/nav&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- ============ HOME PAGE ============ --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="page-home" class="page active"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- HERO --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="hero"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-orb orb1"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-orb orb2"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-tag"&gt;AI Consulting &amp; Automation&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h1 class="hero-headline"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>Build your business&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="line2"&gt;on artificial intelligence.&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="hero-sub"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>We help small and medium businesses adopt AI to save time, cut costs, and grow revenue — with practical systems that actually work.</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-actions"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" class="btn-primary" onclick="showPage('contact')"&gt;Book a Free Consultation <span class="s1">→</span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" class="btn-ghost" onclick="showPage('about')"&gt;About Operon AI&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-stats"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val"&gt;3&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-label"&gt;Core Service Tiers&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val"&gt;100%&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-label"&gt;Custom-Built Systems&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val"&gt;SMB&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="stat-label"&gt;Focused Expertise&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- MARQUEE --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="marquee-wrap"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="marquee-track"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;AI Chatbots&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Workflow Automation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Sales Assistants&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Email Automation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Document Processing&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Data Dashboards&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Marketing AI&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;ROI Audits&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;AI Chatbots&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Workflow Automation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Sales Assistants&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Email Automation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Document Processing&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Data Dashboards&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;Marketing AI&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="marquee-item"&gt;ROI Audits&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- SERVICES --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-tag reveal"&gt;// What we offer&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title reveal"&gt;Three ways we&lt;br&gt;work together.&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="section-sub reveal"&gt;From strategy to execution to ongoing improvement — Operon AI covers every stage of your AI journey.&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="services-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="service-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-num"&gt;01&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="service-icon"&gt;<span class="s3">🔍</span>&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-name"&gt;AI Consultation&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="service-desc"&gt;A focused strategy session where we analyze your operations, uncover automation opportunities, and build a custom AI roadmap with clear ROI projections.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-tags"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Opportunity Audit&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Automation Plan&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;ROI Estimate&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Tool Recommendations&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="service-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-num"&gt;02&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="service-icon"&gt;<span class="s3">⚙️</span>&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-name"&gt;AI Implementation&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="service-desc"&gt;We build the systems. Custom AI solutions tailored to your business — from intelligent chatbots to automated workflows that save hours every day.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-tags"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Customer Chatbots&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Sales AI&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Email Automation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Doc Processing&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Dashboards&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="service-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-num"&gt;03&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="service-icon"&gt;<span class="s3">🔄</span>&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-name"&gt;Monthly AI Maintenance&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="service-desc"&gt;AI systems need to evolve. Our retainer plans keep your tools sharp with ongoing monitoring, prompt optimization, and workflow improvements.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="service-tags"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;System Monitoring&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Prompt Tuning&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Workflow Updates&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="tag"&gt;Monthly Reports&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- HOW IT WORKS --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="process-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-tag reveal"&gt;// The process&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title reveal"&gt;From idea to working&lt;br&gt;AI system in weeks.&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="process-steps"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="process-step reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-num"&gt;01&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-title"&gt;Discovery Call&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="step-desc"&gt;We learn about your business, workflows, and pain points. Free 30-minute consultation to find the right fit.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="process-step reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-num"&gt;02&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-title"&gt;AI Audit&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="step-desc"&gt;We map your operations and identify the highest-ROI automation opportunities available to your business today.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="process-step reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-num"&gt;03&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-title"&gt;Build &amp; Deploy&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="step-desc"&gt;Our team designs and builds your custom AI system, integrated with your existing tools and processes.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="process-step reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-num"&gt;04&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="step-title"&gt;Optimize &amp; Grow&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="step-desc"&gt;We monitor, tune, and improve your systems continuously so your AI gets smarter over time.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- CTA BANNER --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="cta-banner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="reveal"&gt;Ready to bring AI into&lt;br&gt;your business?&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="reveal"&gt;Book a free consultation. No commitments, no jargon — just a clear view of what's possible.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;a href="#" class="btn-primary reveal" onclick="showPage('contact')"&gt;Book a Free Consultation <span class="s1">→</span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-logo"&gt;Operon&lt;span style="color:var(--accent)"&gt;AI&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-copy"&gt;© 2025 Operon AI LLC · Dover, DE&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('home')"&gt;Home&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('about')"&gt;About&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('contact')"&gt;Contact&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- ============ ABOUT PAGE ============ --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="page-about" class="page"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="about-hero"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-orb orb1" style="opacity:0.5"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="about-intro"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="about-text"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="section-tag reveal"&gt;// About Operon AI&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h1 class="reveal"&gt;We make AI work for real businesses.&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="reveal"&gt;Operon AI was built on one belief: that artificial intelligence shouldn't be reserved for large enterprises with massive budgets. Small and medium businesses deserve access to the same powerful tools — without the complexity.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="reveal"&gt;We specialize in finding real, practical opportunities for AI inside your operations and turning them into working systems that save time, reduce costs, and drive growth.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;a href="#" class="btn-primary reveal" onclick="showPage('contact')" style="margin-top:16px"&gt;Work with us <span class="s1">→</span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="about-visual reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="about-card card1"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-label"&gt;Our Mission&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-value" style="font-size:1.1rem; line-height:1.4; color: var(--text)"&gt;Democratize AI for small and medium businesses.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="about-card card2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-label"&gt;Specialization&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-value"&gt;SMB&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-sub"&gt;AI Consulting &amp; Automation&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="mission-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-tag reveal"&gt;// Our Values&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title reveal"&gt;How we think about AI.&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="values-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="value-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-icon"&gt;<span class="s3">🎯</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-title"&gt;Practical First&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="value-text"&gt;No buzzwords. No bloated proposals. We identify automation that delivers measurable ROI for your specific business — not theoretical use cases.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="value-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-icon"&gt;<span class="s3">🔬</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-title"&gt;Built to Fit&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="value-text"&gt;Every business is different. Every system we build is custom-designed around your operations, your tools, and your team.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="value-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-icon"&gt;<span class="s3">📈</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-title"&gt;Long-Term Partnership&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="value-text"&gt;AI isn't a one-time install. We maintain, optimize, and evolve your systems as your business grows and technology advances.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="value-card reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-icon"&gt;<span class="s3">🤝</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="value-title"&gt;Transparent &amp; Honest&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="value-text"&gt;We tell you exactly what AI can and can't do for your business — and we only recommend what's worth your investment.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="team-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-tag reveal"&gt;// Company Info&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title reveal"&gt;Registered &amp; operating&lt;br&gt;in the United States.&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="address-block reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="address-label"&gt;Office Address&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="address-text"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>Operon AI&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>8 The Green, #22629&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>Dover, DE 19901&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>United States</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="legal-name"&gt;Legal entity: Operon AI LLC&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style="margin-top:48px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" class="btn-primary reveal" onclick="showPage('contact')"&gt;Book a Free Consultation <span class="s1">→</span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-logo"&gt;Operon&lt;span style="color:var(--accent)"&gt;AI&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-copy"&gt;© 2025 Operon AI LLC · Dover, DE&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('home')"&gt;Home&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('about')"&gt;About&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('contact')"&gt;Contact&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- ============ CONTACT PAGE ============ --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="page-contact" class="page"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="contact-page"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="contact-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="contact-left"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="section-tag reveal"&gt;// Get in touch&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h1 class="reveal"&gt;Let's talk about&lt;br&gt;your business.&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="reveal"&gt;Book a free 30-minute consultation. We'll learn about your operations and share exactly where AI can make a difference — no pitch, no pressure.&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="contact-info-item reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="ci-icon"&gt;<span class="s3">📍</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-label"&gt;Address&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-value"&gt;8 The Green #22629, Dover, DE 19901&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="contact-info-item reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="ci-icon"&gt;<span class="s3">🏢</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-label"&gt;Legal Name&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-value"&gt;Operon AI LLC&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="contact-info-item reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="ci-icon"&gt;<span class="s3">⚡</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-label"&gt;Response Time&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="ci-value"&gt;Within 1 business day&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="margin-top:40px; padding:28px; border:1px solid var(--border); background:var(--bg2)" class="reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:12px"&gt;What to expect&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;ul style="list-style:none; display:flex; flex-direction:column; gap:10px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"&gt;&lt;span style="color:var(--accent)"&gt;<span class="s1">→</span>&lt;/span&gt; 30-min discovery call at no charge&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"&gt;&lt;span style="color:var(--accent)"&gt;<span class="s1">→</span>&lt;/span&gt; We listen, ask questions, understand your business&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"&gt;&lt;span style="color:var(--accent)"&gt;<span class="s1">→</span>&lt;/span&gt; We share real AI opportunities specific to you&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"&gt;&lt;span style="color:var(--accent)"&gt;<span class="s1">→</span>&lt;/span&gt; Zero obligation to move forward&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="contact-form reveal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div id="formContent"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-title"&gt;Book Your Free Consultation&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-sub"&gt;Fill out the form and we'll be in touch within one business day.&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;label&gt;First Name&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" placeholder="John" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;label&gt;Last Name&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" placeholder="Smith" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;label&gt;Business Email&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type="email" placeholder="john@yourcompany.com" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;label&gt;Company Name&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type="text" placeholder="Your Company LLC" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;label&gt;Business Size&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option value=""&gt;Select...&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option&gt;1–5 employees&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option&gt;6–20 employees&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option&gt;21–50 employees&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option&gt;51–200 employees&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;option&gt;200+ employees&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;label&gt;What are your biggest operational challenges?&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;textarea placeholder="e.g. We spend too much time on manual data entry and responding to customer emails..."&gt;&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="form-submit" onclick="submitForm()"&gt;Submit — Book Free Consultation&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="form-success" id="formSuccess"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="check"&gt;<span class="s3">✅</span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;You're booked in.&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Thanks for reaching out! We'll review your submission and be in touch within one business day to schedule your consultation.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-logo"&gt;Operon&lt;span style="color:var(--accent)"&gt;AI&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-copy"&gt;© 2025 Operon AI LLC · Dover, DE&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('home')"&gt;Home&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('about')"&gt;About&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a href="#" onclick="showPage('contact')"&gt;Contact&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// CURSOR</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const cursor = document.getElementById('cursor');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const ring = document.getElementById('cursorRing');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let mx = 0, my = 0, rx = 0, ry = 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.addEventListener('mousemove', e =&gt; { mx = e.clientX; my = e.clientY; });</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function animateCursor() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor.style.transform = translate(${mx - 5}px, ${my - 5}px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>rx += (mx - rx) * 0.15;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ry += (my - ry) * 0.15;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ring.style.transform = translate(${rx - 18}px, ${ry - 18}px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>requestAnimationFrame(animateCursor);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>animateCursor();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// PAGE ROUTING</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function showPage(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll('.page').forEach(p =&gt; p.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('page-' + id).classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>window.scrollTo({ top: 0, behavior: 'smooth' });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(initReveal, 100);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// SCROLL REVEAL</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function initReveal() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const els = document.querySelectorAll('.page.active .reveal');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const observer = new IntersectionObserver(entries =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>entries.forEach(e =&gt; { if (e.isIntersecting) { e.target.classList.add('visible'); } });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}, { threshold: 0.1 });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>els.forEach(el =&gt; { el.classList.remove('visible'); observer.observe(el); });</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>initReveal();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// FORM SUBMIT</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function submitForm() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('formContent').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('formSuccess').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo" onclick="showPage('home')">
+      <div class="nav-logo-icon">⬡</div>
+      Operon<span style="color:var(--accent)">AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showPage('home')">Home</a></li>
+      <li><a href="#" onclick="showPage('about')">About</a></li>
+      <li><a href="#" onclick="showPage('contact')" class="nav-cta">Book a Consultation</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============ HOME PAGE ============ -->
+  <div id="page-home" class="page active">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-orb orb1"></div>
+      <div class="hero-orb orb2"></div>
+      <div class="hero-tag">AI Consulting & Automation</div>
+      <h1 class="hero-headline">
+        Build your business<br>
+        <span class="line2">on artificial intelligence.</span>
+      </h1>
+      <p class="hero-sub">
+        We help small and medium businesses adopt AI to save time, cut costs, and grow revenue — with practical systems that actually work.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary" onclick="showPage('contact')">Book a Free Consultation →</a>
+        <a href="#" class="btn-ghost" onclick="showPage('about')">About Operon AI</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-val">3</div>
+          <div class="stat-label">Core Service Tiers</div>
+        </div>
+        <div>
+          <div class="stat-val">100%</div>
+          <div class="stat-label">Custom-Built Systems</div>
+        </div>
+        <div>
+          <div class="stat-val">SMB</div>
+          <div class="stat-label">Focused Expertise</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item">AI Chatbots</span>
+        <span class="marquee-item">Workflow Automation</span>
+        <span class="marquee-item">Sales Assistants</span>
+        <span class="marquee-item">Email Automation</span>
+        <span class="marquee-item">Document Processing</span>
+        <span class="marquee-item">Data Dashboards</span>
+        <span class="marquee-item">Marketing AI</span>
+        <span class="marquee-item">ROI Audits</span>
+        <span class="marquee-item">AI Chatbots</span>
+        <span class="marquee-item">Workflow Automation</span>
+        <span class="marquee-item">Sales Assistants</span>
+        <span class="marquee-item">Email Automation</span>
+        <span class="marquee-item">Document Processing</span>
+        <span class="marquee-item">Data Dashboards</span>
+        <span class="marquee-item">Marketing AI</span>
+        <span class="marquee-item">ROI Audits</span>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section class="section">
+      <div class="section-tag reveal">// What we offer</div>
+      <h2 class="section-title reveal">Three ways we<br>work together.</h2>
+      <p class="section-sub reveal">From strategy to execution to ongoing improvement — Operon AI covers every stage of your AI journey.</p>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-num">01</div>
+          <span class="service-icon">🔍</span>
+          <div class="service-name">AI Consultation</div>
+          <p class="service-desc">A focused strategy session where we analyze your operations, uncover automation opportunities, and build a custom AI roadmap with clear ROI projections.</p>
+          <div class="service-tags">
+            <span class="tag">Opportunity Audit</span>
+            <span class="tag">Automation Plan</span>
+            <span class="tag">ROI Estimate</span>
+            <span class="tag">Tool Recommendations</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-num">02</div>
+          <span class="service-icon">⚙️</span>
+          <div class="service-name">AI Implementation</div>
+          <p class="service-desc">We build the systems. Custom AI solutions tailored to your business — from intelligent chatbots to automated workflows that save hours every day.</p>
+          <div class="service-tags">
+            <span class="tag">Customer Chatbots</span>
+            <span class="tag">Sales AI</span>
+            <span class="tag">Email Automation</span>
+            <span class="tag">Doc Processing</span>
+            <span class="tag">Dashboards</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-num">03</div>
+          <span class="service-icon">🔄</span>
+          <div class="service-name">Monthly AI Maintenance</div>
+          <p class="service-desc">AI systems need to evolve. Our retainer plans keep your tools sharp with ongoing monitoring, prompt optimization, and workflow improvements.</p>
+          <div class="service-tags">
+            <span class="tag">System Monitoring</span>
+            <span class="tag">Prompt Tuning</span>
+            <span class="tag">Workflow Updates</span>
+            <span class="tag">Monthly Reports</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="process-section">
+      <div class="section-tag reveal">// The process</div>
+      <h2 class="section-title reveal">From idea to working<br>AI system in weeks.</h2>
+      <div class="process-steps">
+        <div class="process-step reveal">
+          <div class="step-num">01</div>
+          <div class="step-title">Discovery Call</div>
+          <p class="step-desc">We learn about your business, workflows, and pain points. Free 30-minute consultation to find the right fit.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">02</div>
+          <div class="step-title">AI Audit</div>
+          <p class="step-desc">We map your operations and identify the highest-ROI automation opportunities available to your business today.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">03</div>
+          <div class="step-title">Build & Deploy</div>
+          <p class="step-desc">Our team designs and builds your custom AI system, integrated with your existing tools and processes.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">04</div>
+          <div class="step-title">Optimize & Grow</div>
+          <p class="step-desc">We monitor, tune, and improve your systems continuously so your AI gets smarter over time.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="cta-banner">
+      <h2 class="reveal">Ready to bring AI into<br>your business?</h2>
+      <p class="reveal">Book a free consultation. No commitments, no jargon — just a clear view of what's possible.</p>
+      <a href="#" class="btn-primary reveal" onclick="showPage('contact')">Book a Free Consultation →</a>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ ABOUT PAGE ============ -->
+  <div id="page-about" class="page">
+    <section class="about-hero">
+      <div class="hero-orb orb1" style="opacity:0.5"></div>
+
+      <div class="about-intro">
+        <div class="about-text">
+          <div class="section-tag reveal">// About Operon AI</div>
+          <h1 class="reveal">We make AI work for real businesses.</h1>
+          <p class="reveal">Operon AI was built on one belief: that artificial intelligence shouldn't be reserved for large enterprises with massive budgets. Small and medium businesses deserve access to the same powerful tools — without the complexity.</p>
+          <p class="reveal">We specialize in finding real, practical opportunities for AI inside your operations and turning them into working systems that save time, reduce costs, and drive growth.</p>
+          <a href="#" class="btn-primary reveal" onclick="showPage('contact')" style="margin-top:16px">Work with us →</a>
+        </div>
+        <div class="about-visual reveal">
+          <div class="about-card card1">
+            <div class="card-label">Our Mission</div>
+            <div class="card-value" style="font-size:1.1rem; line-height:1.4; color: var(--text)">Democratize AI for small and medium businesses.</div>
+          </div>
+          <div class="about-card card2">
+            <div class="card-label">Specialization</div>
+            <div class="card-value">SMB</div>
+            <div class="card-sub">AI Consulting & Automation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mission-section">
+      <div class="section-tag reveal">// Our Values</div>
+      <h2 class="section-title reveal">How we think about AI.</h2>
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-icon">🎯</div>
+          <div class="value-title">Practical First</div>
+          <p class="value-text">No buzzwords. No bloated proposals. We identify automation that delivers measurable ROI for your specific business — not theoretical use cases.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🔬</div>
+          <div class="value-title">Built to Fit</div>
+          <p class="value-text">Every business is different. Every system we build is custom-designed around your operations, your tools, and your team.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">📈</div>
+          <div class="value-title">Long-Term Partnership</div>
+          <p class="value-text">AI isn't a one-time install. We maintain, optimize, and evolve your systems as your business grows and technology advances.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🤝</div>
+          <div class="value-title">Transparent & Honest</div>
+          <p class="value-text">We tell you exactly what AI can and can't do for your business — and we only recommend what's worth your investment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="team-section">
+      <div class="section-tag reveal">// Company Info</div>
+      <h2 class="section-title reveal">Registered & operating<br>in the United States.</h2>
+      <div class="address-block reveal">
+        <div class="address-label">Office Address</div>
+        <div class="address-text">
+          Operon AI<br>
+          8 The Green, #22629<br>
+          Dover, DE 19901<br>
+          United States
+        </div>
+        <div class="legal-name">Legal entity: Operon AI LLC</div>
+      </div>
+      <div style="margin-top:48px">
+        <a href="#" class="btn-primary reveal" onclick="showPage('contact')">Book a Free Consultation →</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ CONTACT PAGE ============ -->
+  <div id="page-contact" class="page">
+    <section class="contact-page">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="section-tag reveal">// Get in touch</div>
+          <h1 class="reveal">Let's talk about<br>your business.</h1>
+          <p class="reveal">Book a free 30-minute consultation. We'll learn about your operations and share exactly where AI can make a difference — no pitch, no pressure.</p>
+
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">📍</div>
+            <div>
+              <div class="ci-label">Address</div>
+              <div class="ci-value">8 The Green #22629, Dover, DE 19901</div>
+            </div>
+          </div>
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">🏢</div>
+            <div>
+              <div class="ci-label">Legal Name</div>
+              <div class="ci-value">Operon AI LLC</div>
+            </div>
+          </div>
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">⚡</div>
+            <div>
+              <div class="ci-label">Response Time</div>
+              <div class="ci-value">Within 1 business day</div>
+            </div>
+          </div>
+
+          <div style="margin-top:40px; padding:28px; border:1px solid var(--border); background:var(--bg2)" class="reveal">
+            <div style="font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:12px">What to expect</div>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:10px;">
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> 30-min discovery call at no charge</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> We listen, ask questions, understand your business</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> We share real AI opportunities specific to you</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> Zero obligation to move forward</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="contact-form reveal">
+          <div id="formContent">
+            <div class="form-title">Book Your Free Consultation</div>
+            <div class="form-sub">Fill out the form and we'll be in touch within one business day.</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" placeholder="John" />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" placeholder="Smith" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Business Email</label>
+              <input type="email" placeholder="john@yourcompany.com" />
+            </div>
+
+            <div class="form-group">
+              <label>Company Name</label>
+              <input type="text" placeholder="Your Company LLC" />
+            </div>
+
+            <div class="form-group">
+              <label>Business Size</label>
+              <select>
+                <option value="">Select...</option>
+                <option>1–5 employees</option>
+                <option>6–20 employees</option>
+                <option>21–50 employees</option>
+                <option>51–200 employees</option>
+                <option>200+ employees</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>What are your biggest operational challenges?</label>
+              <textarea placeholder="e.g. We spend too much time on manual data entry and responding to customer emails..."></textarea>
+            </div>
+
+            <button class="form-submit" onclick="submitForm()">Submit — Book Free Consultation</button>
+          </div>
+
+          <div class="form-success" id="formSuccess">
+            <div class="check">✅</div>
+            <h3>You're booked in.</h3>
+            <p>Thanks for reaching out! We'll review your submission and be in touch within one business day to schedule your consultation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.transform = translate(${mx - 5}px, ${my - 5}px);
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.transform = translate(${rx - 18}px, ${ry - 18}px);
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // PAGE ROUTING
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(initReveal, 100);
+    }
+
+    // SCROLL REVEAL
+    function initReveal() {
+      const els = document.querySelectorAll('.page.active .reveal');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+      }, { threshold: 0.1 });
+      els.forEach(el => { el.classList.remove('visible'); observer.observe(el); });
+    }
+    initReveal();
+
+    // FORM SUBMIT
+    function submitForm() {
+      document.getElementById('formContent').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }
+  </script>
 </body>
 </html>
