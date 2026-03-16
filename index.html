@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operon AI — AI Consulting & Automation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050810;
+      --bg2: #080d1a;
+      --surface: #0d1428;
+      --border: rgba(255,255,255,0.07);
+      --accent: #00f0c8;
+      --accent2: #3d6bff;
+      --accent3: #ff4d6d;
+      --text: #e8eaf2;
+      --muted: #6b7294;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(0,240,200,0.4);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* GRID BACKGROUND */
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,240,200,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,200,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 20px 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,16,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent) !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s !important;
+      font-family: var(--font-mono);
+    }
+    .nav-cta:hover { background: var(--accent) !important; color: var(--bg) !important; }
+
+    /* PAGE SECTIONS */
+    .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+    .page.active { display: block; }
+
+    /* ===================== HOME PAGE ===================== */
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 140px 6vw 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .orb1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,240,200,0.12), transparent 70%);
+      top: -100px; right: -100px;
+      animation: orb-float 8s ease-in-out infinite;
+    }
+    .orb2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(61,107,255,0.12), transparent 70%);
+      bottom: 0; left: -100px;
+      animation: orb-float 10s ease-in-out infinite reverse;
+    }
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-30px); }
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,240,200,0.06);
+      border: 1px solid rgba(0,240,200,0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+      width: fit-content;
+      margin-bottom: 32px;
+      animation: fade-up 0.6s ease both;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero-headline {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+      max-width: 900px;
+      animation: fade-up 0.6s 0.1s ease both;
+    }
+    .hero-headline .line2 {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fade-up 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      animation: fade-up 0.6s 0.3s ease both;
+    }
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,240,200,0.3);
+    }
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-stats {
+      display: flex; gap: 48px; margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+      animation: fade-up 0.6s 0.4s ease both;
+      flex-wrap: wrap;
+    }
+    .stat-val {
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      overflow: hidden;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .marquee-track {
+      display: flex; gap: 60px;
+      animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .marquee-item::after {
+      content: '◆';
+      color: var(--accent);
+      font-size: 0.5rem;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* SERVICES */
+    .section {
+      padding: 100px 6vw;
+    }
+    .section-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 64px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .service-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .service-card:hover { background: var(--bg2); }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-num {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .service-name {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .service-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .service-tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .tag {
+      font-size: 0.68rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+
+    /* HOW IT WORKS */
+    .process-section {
+      padding: 100px 6vw;
+      background: var(--bg2);
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px;
+      margin-top: 64px;
+      background: var(--border);
+    }
+    .process-step {
+      background: var(--bg2);
+      padding: 36px 28px;
+      position: relative;
+    }
+    .step-num {
+      font-family: var(--font-head);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: rgba(0,240,200,0.08);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .step-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .step-connector {
+      position: absolute;
+      right: -1px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      font-size: 0.8rem;
+      opacity: 0.4;
+    }
+
+    /* CTA BANNER */
+    .cta-banner {
+      padding: 80px 6vw;
+      background: linear-gradient(135deg, rgba(0,240,200,0.05), rgba(61,107,255,0.05));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .cta-banner h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .cta-banner p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    /* ===================== ABOUT PAGE ===================== */
+    .about-hero {
+      padding: 160px 6vw 80px;
+      position: relative;
+    }
+    .about-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-bottom: 100px;
+    }
+    .about-text h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .about-text p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .about-visual {
+      position: relative;
+      height: 400px;
+    }
+    .about-card {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      border-radius: 8px;
+    }
+    .about-card.card1 { top: 0; left: 0; right: 60px; }
+    .about-card.card2 { bottom: 0; left: 60px; right: 0; border-top: 2px solid var(--accent); }
+    .card-label { font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .card-value { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+    .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    .mission-section {
+      padding: 80px 6vw;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .value-card {
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    .value-card:hover { border-color: var(--accent); }
+    .value-icon { font-size: 1.8rem; margin-bottom: 16px; }
+    .value-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .value-text { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+
+    .team-section { padding: 80px 6vw; }
+    .address-block {
+      margin-top: 64px;
+      padding: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      max-width: 500px;
+    }
+    .address-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .address-text { font-size: 0.88rem; line-height: 1.9; color: var(--muted); }
+    .legal-name { font-size: 0.78rem; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    /* ===================== CONTACT PAGE ===================== */
+    .contact-page {
+      padding: 160px 6vw 80px;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contact-left h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .contact-left p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+    .contact-info-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 28px;
+    }
+    .ci-icon {
+      width: 40px; height: 40px;
+      background: rgba(0,240,200,0.08);
+      border: 1px solid rgba(0,240,200,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .ci-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .ci-value { font-size: 0.88rem; color: var(--text); }
+
+    /* FORM */
+    .contact-form {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 48px;
+    }
+    .form-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .form-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 36px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      border-radius: 2px;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group select option { background: var(--bg2); }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-submit {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 16px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: box-shadow 0.2s, transform 0.2s;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .form-submit:hover {
+      box-shadow: 0 8px 30px rgba(0,240,200,0.35);
+      transform: translateY(-1px);
+    }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+    .form-success .check { font-size: 3rem; margin-bottom: 16px; }
+    .form-success h3 {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .form-success p { font-size: 0.85rem; color: var(--muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 6vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: var(--bg);
+      position: relative; z-index: 1;
+    }
+    .footer-logo {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .footer-copy { font-size: 0.75rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .about-intro, .contact-grid { grid-template-columns: 1fr; }
+      .about-visual { height: 280px; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-form { padding: 28px; }
+      .hero-stats { gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo" onclick="showPage('home')">
+      <div class="nav-logo-icon">⬡</div>
+      Operon<span style="color:var(--accent)">AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showPage('home')">Home</a></li>
+      <li><a href="#" onclick="showPage('about')">About</a></li>
+      <li><a href="#" onclick="showPage('contact')" class="nav-cta">Book a Consultation</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============ HOME PAGE ============ -->
+  <div id="page-home" class="page active">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-orb orb1"></div>
+      <div class="hero-orb orb2"></div>
+      <div class="hero-tag">AI Consulting & Automation</div>
+      <h1 class="hero-headline">
+        Build your business<br>
+        <span class="line2">on artificial intelligence.</span>
+      </h1>
+      <p class="hero-sub">
+        We help small and medium businesses adopt AI to save time, cut costs, and grow revenue — with practical systems that actually work.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary" onclick="showPage('contact')">Book a Free Consultation →</a>
+        <a href="#" class="btn-ghost" onclick="showPage('about')">About Operon AI</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-val">3</div>
+          <div class="stat-label">Core Service Tiers</div>
+        </div>
+        <div>
+          <div class="stat-val">100%</div>
+          <div class="stat-label">Custom-Built Systems</div>
+        </div>
+        <div>
+          <div class="stat-val">SMB</div>
+          <div class="stat-label">Focused Expertise</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item">AI Chatbots</span>
+        <span class="marquee-item">Workflow Automation</span>
+        <span class="marquee-item">Sales Assistants</span>
+        <span class="marquee-item">Email Automation</span>
+        <span class="marquee-item">Document Processing</span>
+        <span class="marquee-item">Data Dashboards</span>
+        <span class="marquee-item">Marketing AI</span>
+        <span class="marquee-item">ROI Audits</span>
+        <span class="marquee-item">AI Chatbots</span>
+        <span class="marquee-item">Workflow Automation</span>
+        <span class="marquee-item">Sales Assistants</span>
+        <span class="marquee-item">Email Automation</span>
+        <span class="marquee-item">Document Processing</span>
+        <span class="marquee-item">Data Dashboards</span>
+        <span class="marquee-item">Marketing AI</span>
+        <span class="marquee-item">ROI Audits</span>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section class="section">
+      <div class="section-tag reveal">// What we offer</div>
+      <h2 class="section-title reveal">Three ways we<br>work together.</h2>
+      <p class="section-sub reveal">From strategy to execution to ongoing improvement — Operon AI covers every stage of your AI journey.</p>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-num">01</div>
+          <span class="service-icon">🔍</span>
+          <div class="service-name">AI Consultation</div>
+          <p class="service-desc">A focused strategy session where we analyze your operations, uncover automation opportunities, and build a custom AI roadmap with clear ROI projections.</p>
+          <div class="service-tags">
+            <span class="tag">Opportunity Audit</span>
+            <span class="tag">Automation Plan</span>
+            <span class="tag">ROI Estimate</span>
+            <span class="tag">Tool Recommendations</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-num">02</div>
+          <span class="service-icon">⚙️</span>
+          <div class="service-name">AI Implementation</div>
+          <p class="service-desc">We build the systems. Custom AI solutions tailored to your business — from intelligent chatbots to automated workflows that save hours every day.</p>
+          <div class="service-tags">
+            <span class="tag">Customer Chatbots</span>
+            <span class="tag">Sales AI</span>
+            <span class="tag">Email Automation</span>
+            <span class="tag">Doc Processing</span>
+            <span class="tag">Dashboards</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-num">03</div>
+          <span class="service-icon">🔄</span>
+          <div class="service-name">Monthly AI Maintenance</div>
+          <p class="service-desc">AI systems need to evolve. Our retainer plans keep your tools sharp with ongoing monitoring, prompt optimization, and workflow improvements.</p>
+          <div class="service-tags">
+            <span class="tag">System Monitoring</span>
+            <span class="tag">Prompt Tuning</span>
+            <span class="tag">Workflow Updates</span>
+            <span class="tag">Monthly Reports</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="process-section">
+      <div class="section-tag reveal">// The process</div>
+      <h2 class="section-title reveal">From idea to working<br>AI system in weeks.</h2>
+      <div class="process-steps">
+        <div class="process-step reveal">
+          <div class="step-num">01</div>
+          <div class="step-title">Discovery Call</div>
+          <p class="step-desc">We learn about your business, workflows, and pain points. Free 30-minute consultation to find the right fit.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">02</div>
+          <div class="step-title">AI Audit</div>
+          <p class="step-desc">We map your operations and identify the highest-ROI automation opportunities available to your business today.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">03</div>
+          <div class="step-title">Build & Deploy</div>
+          <p class="step-desc">Our team designs and builds your custom AI system, integrated with your existing tools and processes.</p>
+        </div>
+        <div class="process-step reveal">
+          <div class="step-num">04</div>
+          <div class="step-title">Optimize & Grow</div>
+          <p class="step-desc">We monitor, tune, and improve your systems continuously so your AI gets smarter over time.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="cta-banner">
+      <h2 class="reveal">Ready to bring AI into<br>your business?</h2>
+      <p class="reveal">Book a free consultation. No commitments, no jargon — just a clear view of what's possible.</p>
+      <a href="#" class="btn-primary reveal" onclick="showPage('contact')">Book a Free Consultation →</a>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ ABOUT PAGE ============ -->
+  <div id="page-about" class="page">
+    <section class="about-hero">
+      <div class="hero-orb orb1" style="opacity:0.5"></div>
+
+      <div class="about-intro">
+        <div class="about-text">
+          <div class="section-tag reveal">// About Operon AI</div>
+          <h1 class="reveal">We make AI work for real businesses.</h1>
+          <p class="reveal">Operon AI was built on one belief: that artificial intelligence shouldn't be reserved for large enterprises with massive budgets. Small and medium businesses deserve access to the same powerful tools — without the complexity.</p>
+          <p class="reveal">We specialize in finding real, practical opportunities for AI inside your operations and turning them into working systems that save time, reduce costs, and drive growth.</p>
+          <a href="#" class="btn-primary reveal" onclick="showPage('contact')" style="margin-top:16px">Work with us →</a>
+        </div>
+        <div class="about-visual reveal">
+          <div class="about-card card1">
+            <div class="card-label">Our Mission</div>
+            <div class="card-value" style="font-size:1.1rem; line-height:1.4; color: var(--text)">Democratize AI for small and medium businesses.</div>
+          </div>
+          <div class="about-card card2">
+            <div class="card-label">Specialization</div>
+            <div class="card-value">SMB</div>
+            <div class="card-sub">AI Consulting & Automation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mission-section">
+      <div class="section-tag reveal">// Our Values</div>
+      <h2 class="section-title reveal">How we think about AI.</h2>
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-icon">🎯</div>
+          <div class="value-title">Practical First</div>
+          <p class="value-text">No buzzwords. No bloated proposals. We identify automation that delivers measurable ROI for your specific business — not theoretical use cases.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🔬</div>
+          <div class="value-title">Built to Fit</div>
+          <p class="value-text">Every business is different. Every system we build is custom-designed around your operations, your tools, and your team.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">📈</div>
+          <div class="value-title">Long-Term Partnership</div>
+          <p class="value-text">AI isn't a one-time install. We maintain, optimize, and evolve your systems as your business grows and technology advances.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🤝</div>
+          <div class="value-title">Transparent & Honest</div>
+          <p class="value-text">We tell you exactly what AI can and can't do for your business — and we only recommend what's worth your investment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="team-section">
+      <div class="section-tag reveal">// Company Info</div>
+      <h2 class="section-title reveal">Registered & operating<br>in the United States.</h2>
+      <div class="address-block reveal">
+        <div class="address-label">Office Address</div>
+        <div class="address-text">
+          Operon AI<br>
+          8 The Green, #22629<br>
+          Dover, DE 19901<br>
+          United States
+        </div>
+        <div class="legal-name">Legal entity: Operon AI LLC</div>
+      </div>
+      <div style="margin-top:48px">
+        <a href="#" class="btn-primary reveal" onclick="showPage('contact')">Book a Free Consultation →</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ CONTACT PAGE ============ -->
+  <div id="page-contact" class="page">
+    <section class="contact-page">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="section-tag reveal">// Get in touch</div>
+          <h1 class="reveal">Let's talk about<br>your business.</h1>
+          <p class="reveal">Book a free 30-minute consultation. We'll learn about your operations and share exactly where AI can make a difference — no pitch, no pressure.</p>
+
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">📍</div>
+            <div>
+              <div class="ci-label">Address</div>
+              <div class="ci-value">8 The Green #22629, Dover, DE 19901</div>
+            </div>
+          </div>
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">🏢</div>
+            <div>
+              <div class="ci-label">Legal Name</div>
+              <div class="ci-value">Operon AI LLC</div>
+            </div>
+          </div>
+          <div class="contact-info-item reveal">
+            <div class="ci-icon">⚡</div>
+            <div>
+              <div class="ci-label">Response Time</div>
+              <div class="ci-value">Within 1 business day</div>
+            </div>
+          </div>
+
+          <div style="margin-top:40px; padding:28px; border:1px solid var(--border); background:var(--bg2)" class="reveal">
+            <div style="font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:12px">What to expect</div>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:10px;">
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> 30-min discovery call at no charge</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> We listen, ask questions, understand your business</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> We share real AI opportunities specific to you</li>
+              <li style="font-size:0.82rem; color:var(--muted); display:flex; gap:10px;"><span style="color:var(--accent)">→</span> Zero obligation to move forward</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="contact-form reveal">
+          <div id="formContent">
+            <div class="form-title">Book Your Free Consultation</div>
+            <div class="form-sub">Fill out the form and we'll be in touch within one business day.</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" placeholder="John" />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" placeholder="Smith" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Business Email</label>
+              <input type="email" placeholder="john@yourcompany.com" />
+            </div>
+
+            <div class="form-group">
+              <label>Company Name</label>
+              <input type="text" placeholder="Your Company LLC" />
+            </div>
+
+            <div class="form-group">
+              <label>Business Size</label>
+              <select>
+                <option value="">Select...</option>
+                <option>1–5 employees</option>
+                <option>6–20 employees</option>
+                <option>21–50 employees</option>
+                <option>51–200 employees</option>
+                <option>200+ employees</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>What are your biggest operational challenges?</label>
+              <textarea placeholder="e.g. We spend too much time on manual data entry and responding to customer emails..."></textarea>
+            </div>
+
+            <button class="form-submit" onclick="submitForm()">Submit — Book Free Consultation</button>
+          </div>
+
+          <div class="form-success" id="formSuccess">
+            <div class="check">✅</div>
+            <h3>You're booked in.</h3>
+            <p>Thanks for reaching out! We'll review your submission and be in touch within one business day to schedule your consultation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Operon<span style="color:var(--accent)">AI</span></div>
+      <div class="footer-copy">© 2025 Operon AI LLC · Dover, DE</div>
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // PAGE ROUTING
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(initReveal, 100);
+    }
+
+    // SCROLL REVEAL
+    function initReveal() {
+      const els = document.querySelectorAll('.page.active .reveal');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+      }, { threshold: 0.1 });
+      els.forEach(el => { el.classList.remove('visible'); observer.observe(el); });
+    }
+    initReveal();
+
+    // FORM SUBMIT
+    function submitForm() {
+      document.getElementById('formContent').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
